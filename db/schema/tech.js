@@ -1,11 +1,10 @@
 var mongoose = require('mongoose');
 
 var SchemaObject = {
-  username : String,
-  password : String,
-  displayname: String,
-  techs: [String],
-  isGM:Boolean
+  name : String,
+  owner : { type : mongoose.Schema.Types.ObjectId, ref : 'UserModel'},
+  effect: [String],
+  shared_with : [{ type : mongoose.Schema.Types.ObjectId, ref : 'UserModel'}]
 };
 
 var SchemaOptions = {
@@ -20,6 +19,6 @@ var SchemaOptions = {
 
 exports.init = function(db) {
   var Schema = new mongoose.Schema(SchemaObject, SchemaOptions);
-  exports.user = db.model('UserModel', Schema);
-  exports.exportedFields = ['user'];
+  exports.tech = db.model('TechModel', Schema);
+  exports.exportedFields = ['tech'];
 };

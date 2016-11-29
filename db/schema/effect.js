@@ -1,11 +1,10 @@
 var mongoose = require('mongoose');
 
 var SchemaObject = {
-  username : String,
-  password : String,
-  displayname: String,
-  techs: [String],
-  isGM:Boolean
+  target : String,
+  modifier: Number,
+ value : String
+
 };
 
 var SchemaOptions = {
@@ -20,6 +19,6 @@ var SchemaOptions = {
 
 exports.init = function(db) {
   var Schema = new mongoose.Schema(SchemaObject, SchemaOptions);
-  exports.user = db.model('UserModel', Schema);
-  exports.exportedFields = ['user'];
+  exports.effect = db.model('EffectModel', Schema);
+  exports.exportedFields = ['effect'];
 };
