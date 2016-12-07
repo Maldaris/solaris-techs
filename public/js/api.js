@@ -3,8 +3,7 @@ var setLoginState = function(state) {
         $('.onLoginShow').show();
         $('.onLoginHide').hide();
     } else {
-        $('.onLoginShow').hide();
-        $('.onLoginHide').show();
+        $('.onLoginShow').hide        $('.onLoginHide').show();
     }
 }
 var assembleNewReviewData = function(productId, productName){
@@ -190,17 +189,17 @@ var loadReviewsForProduct = function(target, productId, productName) {
     });
 };
 
-var assembleNewTechData = function(productId, productName){
+var assembleNewTechData = function(userId, userName){
   var ret = {
-    'techId' : techId,
-    'techName'  : techName
+    'userId' : userId,
+    'userName'  : userName
   };
-  ret.keys = ['techName', 'techId'];
+  ret.keys = ['userName', 'userId'];
   return ret;
 };
 
-var loadNewTech = function(target, productId, productName) {
-  return loadTemplate('newTech', target, assembleNewTechData(techId,techName)).then(function(value){
+var loadNewTech = function(target, userId, userName) {
+  return loadTemplate('newTech', target, assembleNewTechData(userId,userName)).then(function(value){
     $('button[type="submit"]').click(function(e){
       e.preventDefault();
       e.stopPropagation();
