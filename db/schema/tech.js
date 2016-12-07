@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var SchemaObject = {
   name : String,
   owner : { type : mongoose.Schema.Types.ObjectId, ref : 'UserModel'},
-  effect: [String],
+  effect: [{type : mongoose.Schema.Types.ObjectId, ref : 'EffectModel'}],
   shared_with : [{ type : mongoose.Schema.Types.ObjectId, ref : 'UserModel'}]
 };
 

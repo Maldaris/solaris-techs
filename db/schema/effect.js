@@ -3,8 +3,7 @@ var mongoose = require('mongoose');
 var SchemaObject = {
   target : String,
   modifier: Number,
- value : String
-
+  value : String
 };
 
 var SchemaOptions = {

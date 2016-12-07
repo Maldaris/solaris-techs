@@ -16,6 +16,9 @@ var assembleNewReviewData = function(productId, productName){
   return ret;
 };
 
+
+
+
 var assembleErrorData = function(error) {
     var ret = {};
     ret.keys = ['error'];
@@ -185,4 +188,47 @@ var loadReviewsForProduct = function(target, productId, productName) {
             });
         }
     });
+};
+
+var assembleNewTechData = function(productId, productName){
+  var ret = {
+    'techId' : techId,
+    'techName'  : techName
+  };
+  ret.keys = ['techName', 'techId'];
+  return ret;
+};
+
+var loadNewTech = function(target, productId, productName) {
+  return loadTemplate('newTech', target, assembleNewTechData(techId,techName)).then(function(value){
+    $('button[type="submit"]').click(function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var postbody = {};
+      var form = $('form.pure-form');
+      form.find('input').each(function(i, e) {
+          postbody[$(e).attr('name')] = $(e).val();
+      });
+      form.find('select').each(function(i, e) {
+          postbody[$(e).attr('name')] = $(e).val();
+      });
+      form.find('textarea').each(function(i, e){
+          postbody[$(e).attr('name')] = $(e).val();
+      });
+      $.ajax({
+          url: '../tech/new',
+          dataType: 'json',
+          method: 'POST',
+          data: postbody
+      }).done(function(data) {
+          if (data.success === false) {
+              return loadTemplate('error', target, assembleErrorData(data.error));
+          } else {
+              return loadReviewsForProduct(target,techId, techName);
+          }
+      });
+    });
+  }, function(reason){
+    return loadTemplate('error', target, assembleErrorData(reason));
+  });
 };

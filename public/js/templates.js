@@ -1,10 +1,12 @@
 var loginSource = "../public/templates/login.html";
 var productsSource = ["../public/templates/products.html", "../public/templates/productsTile.html"];
 var reviewsSource = ["../public/templates/reviews.html", "../public/templates/reviewsTile.html"];
-
 var newReviewSource = "../public/templates/newReview.html";
 var errorSource = "../public/templates/error.html";
 var registerSource = "../public/templates/register.html";
+
+
+var newTechSource = "../public/templates/newTech.html";
 
 function loadSrc(url) {
     if (Array.isArray(url)) {
@@ -89,7 +91,8 @@ var templates = {
     'reviews': new Template(reviewsSource, listApplicator),
     'newReview': new Template(newReviewSource, defaultApplicator),
     'error' : new Template(errorSource, defaultApplicator),
-    'register' : new Template(registerSource, nullApplicator)
+    'register' : new Template(registerSource, nullApplicator),
+    'newTech': new Template(newTechSource, defaultApplicator),
 };
 
 var loadTemplate = function(name, target, data) {
