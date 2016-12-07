@@ -191,15 +191,15 @@ var loadReviewsForProduct = function(target, productId, productName) {
 
 var assembleNewTechData = function(userId, userName){
   var ret = {
-    'userId' : userId,
-    'userName'  : userName
+    'techId' : techId,
+    'techName'  : techName
   };
-  ret.keys = ['userName', 'userId'];
+  ret.keys = ['techName', 'techId'];
   return ret;
 };
 
 var loadNewTech = function(target, userId, userName) {
-  return loadTemplate('newTech', target, assembleNewTechData(userId,userName)).then(function(value){
+  return loadTemplate('newTech', target, assembleNewTechData(techId,techName)).then(function(value){
     $('button[type="submit"]').click(function(e){
       e.preventDefault();
       e.stopPropagation();
