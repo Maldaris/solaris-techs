@@ -29,7 +29,7 @@ app.use(session({
 }));
 
 require('./routeLoader').init(app, database, '/routes');
-
+console.log(__dirname)
 app.get('/', function(req, res){
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -40,4 +40,4 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-app.listen(80);
+app.listen(8080);
