@@ -3,10 +3,10 @@ var setLoginState = function(state) {
         $('.onLoginShow').show();
         $('.onLoginHide').hide();
     } else {
-        $('.onLoginShow').hide();
-        $('.onLoginHide').show();
+        $('.onLoginShow').hide();     
+           $('.onLoginHide').show();
     }
-};
+}
 var assembleNewReviewData = function(productId, productName){
   var ret = {
     'productId' : productId,
@@ -15,9 +15,6 @@ var assembleNewReviewData = function(productId, productName){
   ret.keys = ['productName', 'productId'];
   return ret;
 };
-
-
-
 
 var assembleErrorData = function(error) {
     var ret = {};
@@ -113,7 +110,7 @@ var loadRegisterPage = function(target){
   }, function(reason){
     return loadTemplate('error', target, assembleErrorData(reason));
   });
-};
+}
 var loadProductIndex = function(target) {
     $.ajax({
         url: "../products/all",
@@ -201,6 +198,7 @@ var assembleNewTechData = function(userId, userName){
 
 var loadNewTech = function(target, userId, userName) {
   return loadTemplate('newTech', target, assembleNewTechData(techId,techName)).then(function(value){
+   // loadPlayerName()
     $('button[type="submit"]').click(function(e){
       e.preventDefault();
       e.stopPropagation();
@@ -231,4 +229,28 @@ var loadNewTech = function(target, userId, userName) {
   }, function(reason){
     return loadTemplate('error', target, assembleErrorData(reason));
   });
+};
+var assemblePlayerName = function(player) {
+    var ret = {};
+    ret.keys = {};
+    ret.body = {};
+    ret.keys.list = ["displayname", "techs", "_id"];
+    ret.body.list = ["toAdd"];
+    ret.list = products;
+    return ret;
+};
+var loadPlayerName = function(target) {
+    $.ajax({
+        url: "../palyernames/all",
+        dataType: 'json'
+    }).done(function(data) {
+        if (data.success === false) {
+            return loadTemplate('error', target, assembleErrorData(data.error));
+        } else {
+            return loadTemplate('playerNames', target, assemblePlayerName(data.result)).then(function(resolve) {
+            }, function(reason) {
+                return loadTemplate('error', target, assembleErrorData(reason));
+            });
+        }
+    });
 };
