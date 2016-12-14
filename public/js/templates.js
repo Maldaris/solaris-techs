@@ -4,7 +4,8 @@ var registerSource = "../public/templates/register.html";
 
 
 var newTechSource = "../public/templates/newTech.html";
-
+var playerNamesSource  = "../public/templates/playerNames.html";
+var playerNamesTileSource  = "../public/templates/playerNamesTile.html";
 function loadSrc(url) {
     if (Array.isArray(url)) {
           var promises = [];
@@ -87,6 +88,7 @@ var templates = {
     'error' : new Template(errorSource, defaultApplicator),
     'register' : new Template(registerSource, nullApplicator),
     'newTech': new Template(newTechSource, defaultApplicator),
+    'playerNames': new Template([playerNamesSource, playerNamesTileSource], listApplicator),
 };
 
 var loadTemplate = function(name, target, data) {
