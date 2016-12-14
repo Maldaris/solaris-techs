@@ -3,9 +3,10 @@ var setLoginState = function(state) {
         $('.onLoginShow').show();
         $('.onLoginHide').hide();
     } else {
-        $('.onLoginShow').hide        $('.onLoginHide').show();
+        $('.onLoginShow').hide();
+        $('.onLoginHide').show();
     }
-}
+};
 var assembleNewReviewData = function(productId, productName){
   var ret = {
     'productId' : productId,
@@ -112,7 +113,7 @@ var loadRegisterPage = function(target){
   }, function(reason){
     return loadTemplate('error', target, assembleErrorData(reason));
   });
-}
+};
 var loadProductIndex = function(target) {
     $.ajax({
         url: "../products/all",

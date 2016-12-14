@@ -4,7 +4,7 @@ var SchemaObject = {
   category : String,
   target : String,
   modifier: Number,
-  operation : String
+  operator : String
 };
 
 var SchemaOptions = {
