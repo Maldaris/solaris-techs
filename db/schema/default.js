@@ -11,7 +11,7 @@ var SchemaObject = {
     '65-80':{type:Number,default:4},
     '81-89':{type:Number,default:5},
     '90-100':{type:Number,default:8}
-  }
+  },
   raw:
   {
     '0-40':{type:Number,default:0},
@@ -20,7 +20,7 @@ var SchemaObject = {
     '65-80':{type:Number,default:4},
     '81-89':{type:Number,default:5},
     '90-100':{type:Number,default:8}
-  }
+  },
 
   water:
   {
@@ -30,8 +30,7 @@ var SchemaObject = {
     '65-80':{type:Number,default:3},
     '81-89':{type:Number,default:4},
     '90-100':{type:Number,default:6}
-  }
-
+  },
   fuel:
   {
     '0-40':{type:Number,default:0},
@@ -40,7 +39,7 @@ var SchemaObject = {
     '65-80':{type:Number,default:3},
     '81-89':{type:Number,default:4},
     '90-100':{type:Number,default:6}
-  }
+  },
 
     exotic:
   {
@@ -51,7 +50,7 @@ var SchemaObject = {
     '81-89':{type:Number,default:4},
     '90-100':{type:Number,default:6}
   }
-  }
+},
 
 
 

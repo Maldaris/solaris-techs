@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
 
 var SchemaObject = {
+  category : String,
   target : String,
   modifier: Number,
-  value : String
+  operation : String
 };
 
 var SchemaOptions = {

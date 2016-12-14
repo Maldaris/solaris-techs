@@ -29,7 +29,6 @@ app.use(session({
 }));
 
 require('./routeLoader').init(app, database, '/routes');
-console.log(__dirname)
 app.get('/', function(req, res){
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

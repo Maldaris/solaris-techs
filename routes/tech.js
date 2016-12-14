@@ -1,46 +1,106 @@
 var Router = require('express').Router;
 
-var init = function(db){
-  var router = new Router();
-
-  var res_error = function(res, err) {
-      return res.end({
-          'success': false,
-          'error': err.toString()
-      });
-  };
-  var res_success = function(res, err) {
-      return res.end({
-          'success': true,
-          'result': err
-      });
-  };
-
-  router.use(function(req, res, next){
-    if(req.session.isAuthenticated === false || req.session.isAuthenticated === undefined)
-      res.redirect('../login/');
-    next();
+var db_getDefaults = function(db, cb){
+  return DefaultModel.findOne({}, function(err, result){
+    if(err) return cb(false, err);
+    return cb(true, result);
   });
+};
 
-  router.get('/', function(req, res){
-      res.sendFile(path.join(__dirname, 'public', 'tech.html'));
-  });
-  router.get('/getUserTechs', function(req, res){
+var db_findTechs = function(db, username, cb) {
+    var UserModel = db.model('UserModel');
+    var TechModel = db.model('TechModel');
 
-  });
-  router.get('/getGlobalTechs', function(req, res){
+    UserModel.findOne({
+        user: username
+    }).exec(function(err, user) {
+        if (err) return cb(false, err);
+        var uid = user._id;
+        TechModel.find({
+            $or: [{
+                owner: uid
+            }, {
+                shared_with: {
+                    $in: [uid]
+                }
+            }]
+        }).populate('EffectModel').exec(function(err, result) {
+            if (err) return cb(false, err);
+            return cb(true, result);
+        });
+    });
+};
+var db_findTechByType = function(db, username, category, cb) {
+    var TechModel = db.model('TechModel');
+    var UserModel = db.model('UserModel');
+    UserModel.findOne({
+        user: username
+    }).exec(function(err, user) {
+        if (err) return cb(false, err);
+        var uid = user._id;
+        TechModel.find({
 
-  });
-  router.get('/getUserPrivateTechs', function(req, res){
+        }).populate('EffectModel').exec(function(err, result) {
+          if(err) return cb(false, err);
+          
+        });
+    });
+};
 
-  });
-  router.post('/markTechPrivate', function(req, res){
+var init = function(db) {
+    var router = new Router();
 
-  });
-  router.post('/shareTech', function(req, res){
+    var res_error = function(res, err, dat) {
+        if (dat !== undefined) {
+            return res.end(Object.assign({
+                'success': false,
+                'error': err.toString()
+            }, dat));
+        } else {
+            return res.end({
+                'success': false,
+                'error': err.toString()
+            });
+        }
+    };
+    var res_success = function(res, err, dat) {
+        if (dat !== undefined) {
+            return res.end(Object.assign({
+                'success': false,
+                'error': err.toString()
+            }, dat));
+        } else {
+            return res.end({
+                'success': true,
+                'result': err
+            });
+        }
+    };
 
-  });
+    router.use(function(req, res, next) {
+        if (req.session.isAuthenticated !== true)
+            res_error(res, "Unauthenticated");
+        next();
+    });
+    router.get('/defaults/resources/{type}', function(req, res) {
+        return db_findTechByType(db, username, ['resources', req.param.type], function(success, result) {
+            if (success === false) return res_error(res, result);
 
-  return router;
+        });
+    });
+    router.get('/defaults/construction/{type}', function(req, res) {
+        return db_findTechByType(db, username, ['construction', req.param.type], function(success, result) {
+            if (success === false) return res_error(res, result);
+            return db_getDefaults(db, function(success, defaults){
+              var val = defaults.construction[req.param.type];
+              for (var i = 0; i < result.length; i++) {}
+            });
+        });
+    });
+
+    router.get('/techs', function(req, res) {
+
+    });
+    return router;
 };
 exports.init = init;

@@ -15,7 +15,7 @@ var validate = {
         fields: [],
         strict: false
     }
-}
+};
 var fields_validate = function(body, route) {
     var obj = validate[route];
     if (obj.strict === true) {
@@ -27,8 +27,8 @@ var fields_validate = function(body, route) {
         }
         return stripped;
     } else {
-        for (var i = 0; i < obj.fields.length; i++) {
-            if (body[obj.fields[i]] === undefined)
+        for (var j = 0; j < obj.fields.length; j++) {
+            if (body[obj.fields[j]] === undefined)
                 return false;
         }
     }
@@ -39,13 +39,13 @@ var res_error = function(res, err) {
         'success': false,
         'error': err.toString()
     });
-}
+};
 var res_success = function(res, err) {
     return res.end({
         'success': true,
         'result': err
     });
-}
+};
 
 var init = function(db) {
     var UserModel = db.model('UserModel');
@@ -64,7 +64,7 @@ var init = function(db) {
             'username': clean.user
         }, function(err, res) {
             if (err) return res_error(res, err);
-            if (res != null || res !== undefined)
+            if (res !== null || res !== undefined)
                 return res_error(res, 'User already exists');
             else
                 return (new UserModel({

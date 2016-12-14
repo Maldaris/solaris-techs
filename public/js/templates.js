@@ -1,7 +1,4 @@
 var loginSource = "../public/templates/login.html";
-var productsSource = ["../public/templates/products.html", "../public/templates/productsTile.html"];
-var reviewsSource = ["../public/templates/reviews.html", "../public/templates/reviewsTile.html"];
-var newReviewSource = "../public/templates/newReview.html";
 var errorSource = "../public/templates/error.html";
 var registerSource = "../public/templates/register.html";
 
@@ -37,7 +34,7 @@ function loadSrc(url) {
 }
 
 var defaultApplicator = function(src, dat) {
-    var body = "" + src
+    var body = "" + src;
     var values = [];
 
     for(var i = 0; i < dat.keys.length; i++) {
@@ -63,8 +60,8 @@ var listApplicator = function(src, data) {
     }
     var comp = {};
     comp.keys = data.body.list;
-    for(var i = 0; i < comp.keys.length; i++){
-      comp[comp.keys[i]] = data[comp.keys[i]];
+    for(var j = 0; j < comp.keys.length; j++){
+      comp[comp.keys[j]] = data[comp.keys[j]];
     }
     comp.toAdd = toAdd;
     return defaultApplicator(src[0], comp);
@@ -87,9 +84,6 @@ Template.prototype.insert = function(target, data) {
 
 var templates = {
     'login': new Template(loginSource, nullApplicator),
-    'products': new Template(productsSource, listApplicator),
-    'reviews': new Template(reviewsSource, listApplicator),
-    'newReview': new Template(newReviewSource, defaultApplicator),
     'error' : new Template(errorSource, defaultApplicator),
     'register' : new Template(registerSource, nullApplicator),
     'newTech': new Template(newTechSource, defaultApplicator),
@@ -103,7 +97,6 @@ var loadTemplate = function(name, target, data) {
         tmp.insert(target, data);
         return resolve(true);
     } catch (e) {
-        debugger;
         return reject(e);
     }
   });
