@@ -6,6 +6,8 @@ var registerSource = "../public/templates/register.html";
 var newTechSource = "../public/templates/newTech.html";
 var playerNamesSource  = "../public/templates/playerNames.html";
 var playerNamesTileSource  = "../public/templates/playerNamesTile.html";
+var resourceTableSource = "../public/templates/defaultTables.html";
+
 function loadSrc(url) {
     if (Array.isArray(url)) {
           var promises = [];
@@ -68,7 +70,12 @@ var listApplicator = function(src, data) {
     return defaultApplicator(src[0], comp);
 };
 
-function Template(src, applicator) {
+function Template(src, applicator, clearOnLoad) {
+    if(clearOnLoad === undefined){
+      this.clearOnLoad = true;
+    } else {
+      this.clearOnLoad = clearOnLoad;
+    }
     this.applicator = applicator;
     var _this = this;
     loadSrc(src).then(function(val) {
@@ -79,7 +86,8 @@ function Template(src, applicator) {
 }
 Template.prototype.insert = function(target, data) {
     var src = this.applicator(this.src, data);
-    target.empty();
+    if(this.clearOnLoad === true)
+      target.empty();
     target.append(src);
 };
 
@@ -87,8 +95,9 @@ var templates = {
     'login': new Template(loginSource, nullApplicator),
     'error' : new Template(errorSource, defaultApplicator),
     'register' : new Template(registerSource, nullApplicator),
-    'newTech': new Template(newTechSource, defaultApplicator),
+    'newTech': new Template(newTechSource, nullApplicator),
     'playerNames': new Template([playerNamesSource, playerNamesTileSource], listApplicator),
+    'resourceTable' : new Template(resourceTableSource, nullApplicator)
 };
 
 var loadTemplate = function(name, target, data) {

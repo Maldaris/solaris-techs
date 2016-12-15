@@ -6,12 +6,22 @@ var fs = require('fs');
 var path = require('path');
 var database = require('./db/connect').applicationConnection;
 
+var DefaultsModel = database.model('DefaultModel');
+DefaultsModel.findOne({}, function(err, result){
+  if(err) throw err;
+  if(result === null){
+    (new DefaultsModel()).save(function(err){
+      if(err) throw err;
+    });
+  }
+});
+
 var app = express();
 
 var config = fs.readFileSync(path.join(__dirname,'/config/development.json'));
 
 app.use(logger('dev'));
-app.use(bodyParser());
+app.use(bodyParser.urlencoded({ 'extended' : true }));
 app.use('/public', express.static('public'));
 
 var loadSecret = function(path) {
@@ -39,4 +49,4 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-app.listen(8080);
+app.listen(80);

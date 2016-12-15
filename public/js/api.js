@@ -3,42 +3,32 @@ var setLoginState = function(state) {
         $('.onLoginShow').show();
         $('.onLoginHide').hide();
     } else {
-        $('.onLoginShow').hide();     
-           $('.onLoginHide').show();
+        $('.onLoginShow').hide();
+        $('.onLoginHide').show();
     }
-}
-var assembleNewReviewData = function(productId, productName){
-  var ret = {
-    'productId' : productId,
-    'productName'  : productName
-  };
-  ret.keys = ['productName', 'productId'];
-  return ret;
 };
-
+var isGM = function() {
+    return new Promise(function(resolve, reject) {
+        try {
+            $.ajax({
+                'url': '../user/isGM',
+                'dataType': 'json'
+            }).done(function(data) {
+                if (data.success === true) {
+                    resolve(data.result);
+                } else {
+                    reject(data.error);
+                }
+            });
+        } catch (e) {
+            return reject(e);
+        }
+    });
+}
 var assembleErrorData = function(error) {
     var ret = {};
     ret.keys = ['error'];
     ret.error = error;
-    return ret;
-};
-var assembleProductsData = function(products) {
-    var ret = {};
-    ret.keys = {};
-    ret.body = {};
-    ret.keys.list = ["name", "price", "ratings", "_id"];
-    ret.body.list = ["toAdd"];
-    ret.list = products;
-    return ret;
-};
-var assembleReviewsData = function(productName, reviews) {
-    var ret = { productName : productName };
-    ret.keys = {};
-    ret.body = {};
-    ret.keys.list = ["rating", "body"];
-    ret.body.list = ["productName", "toAdd"];
-    ret.list = reviews;
-    ret.productName = productName;
     return ret;
 };
 var loadLoginPage = function(target) {
@@ -65,7 +55,15 @@ var loadLoginPage = function(target) {
                     return loadTemplate('error', target, assembleErrorData(data.error));
                 } else {
                     setLoginState(true);
-                    return loadProductIndex(target);
+                    isGM().then(function(value) {
+                        if (value === true)
+                            return loadTemplate('newTech', target);
+                        else {
+                            return loadTemplate('resourceTable', target);
+                        }
+                    }, function(error) {
+                        return loadTemplate('error', target, assembleErrorData(error));
+                    });
                 }
             });
         });
@@ -78,179 +76,106 @@ var logoutHandler = function(target) {
         url: "../user/logout",
         dataType: 'json'
     }).done(function(data) {
+        setLoginState(false);
         return loadLoginPage(target);
     });
 };
-var loadRegisterPage = function(target){
-  return loadTemplate('register', target).then(function(value){
-    $('button[type="submit"]').click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var postbody = {};
-        var form = $('form.pure-form');
-        form.find('input').each(function(i, e) {
-            postbody[$(e).attr('name')] = $(e).val();
-        });
-        form.find('select').each(function(i, e) {
-            postbody[$(e).attr('name')] = $(e).val();
-        });
-        $.ajax({
-            url: '../user/register',
-            dataType: 'json',
-            method: 'POST',
-            data: postbody
-        }).done(function(data) {
-            if (data.success === false) {
-                return loadTemplate('error', target, assembleErrorData(data.error));
-            } else {
-                return loadLoginPage(target);
-            }
-        });
-    });
-  }, function(reason){
-    return loadTemplate('error', target, assembleErrorData(reason));
-  });
-}
-var loadProductIndex = function(target) {
-    $.ajax({
-        url: "../products/all",
-        dataType: 'json'
-    }).done(function(data) {
-        if (data.success === false) {
-            return loadTemplate('error', target, assembleErrorData(data.error));
-        } else {
-            return loadTemplate('products', target, assembleProductsData(data.result)).then(function(resolve) {
-                $('a.inspectProduct').click(function(e) {
-                    var productId = $(e.target).attr('id');
-                    var productName = $(e.target).parent().children('span.productsTileName').html();
-                    return loadReviewsForProduct(target, productId, productName);
-                });
-            }, function(reason) {
-                return loadTemplate('error', target, assembleErrorData(reason));
+var loadRegisterPage = function(target) {
+    return loadTemplate('register', target).then(function(value) {
+        $('button[type="submit"]').click(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var postbody = {};
+            var form = $('form.pure-form');
+            form.find('input').each(function(i, e) {
+                if ($(e).attr('type') === 'checkbox') {
+                    postbody[$(e).attr('name')] = $(e).is(":checked");
+                } else {
+                    postbody[$(e).attr('name')] = $(e).val();
+                }
             });
-        }
-    });
-};
-var loadNewReview = function(target, productId, productName) {
-  return loadTemplate('newReview', target, assembleNewReviewData(productId, productName)).then(function(value){
-    $('button[type="submit"]').click(function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      var postbody = {};
-      var form = $('form.pure-form');
-      form.find('input').each(function(i, e) {
-          postbody[$(e).attr('name')] = $(e).val();
-      });
-      form.find('select').each(function(i, e) {
-          postbody[$(e).attr('name')] = $(e).val();
-      });
-      form.find('textarea').each(function(i, e){
-          postbody[$(e).attr('name')] = $(e).val();
-      });
-      $.ajax({
-          url: '../reviews/new',
-          dataType: 'json',
-          method: 'POST',
-          data: postbody
-      }).done(function(data) {
-          if (data.success === false) {
-              return loadTemplate('error', target, assembleErrorData(data.error));
-          } else {
-              return loadReviewsForProduct(target, productId, productName);
-          }
-      });
-    });
-  }, function(reason){
-    return loadTemplate('error', target, assembleErrorData(reason));
-  });
-};
-var loadReviewsForProduct = function(target, productId, productName) {
-    $.ajax({
-        url: '../reviews/product/' + productId,
-        dataType: 'json'
-    }).done(function(data) {
-        if (data.success === false) {
-            return loadTemplate('error', target, assembleErrorData(data.result));
-        } if(data.success === true && data.result.length === 0){
-            return loadNewReview(target, productId, productName);
-        } else {
-            return loadTemplate('reviews', target, assembleReviewsData(productName, data.result)).then(function(value) {
-                $('button[type="submit"]').click(function(e) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  return loadNewReview(target, productId, productName);
-                });
-            }, function(reason) {
-                return loadTemplate('error', target, assembleErrorData(reason));
+            form.find('select').each(function(i, e) {
+                postbody[$(e).attr('name')] = $(e).val();
             });
-        }
+            $.ajax({
+                url: '../user/register',
+                dataType: 'json',
+                method: 'POST',
+                data: postbody
+            }).done(function(data) {
+                if (data.success === false) {
+                    return loadTemplate('error', target, assembleErrorData(data.error));
+                } else {
+                    return loadLoginPage(target);
+                }
+            });
+        });
+    }, function(reason) {
+        return loadTemplate('error', target, assembleErrorData(reason));
     });
 };
-
-var assembleNewTechData = function(userId, userName){
-  var ret = {
-    'techId' : techId,
-    'techName'  : techName
-  };
-  ret.keys = ['techName', 'techId'];
-  return ret;
-};
-
-var loadNewTech = function(target, userId, userName) {
-  return loadTemplate('newTech', target, assembleNewTechData(techId,techName)).then(function(value){
-   // loadPlayerName()
-    $('button[type="submit"]').click(function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      var postbody = {};
-      var form = $('form.pure-form');
-      form.find('input').each(function(i, e) {
-          postbody[$(e).attr('name')] = $(e).val();
+var loadNewTech = function(target) {
+    return loadTemplate('newTech', target).then(function(value) {
+        loadPlayerName($('div#playerNameSelection')).then(function(result){
+        $('button[type="submit"]').click(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var postbody = {};
+            var form = $('form.pure-form');
+            form.find('input').each(function(i, e) {
+                postbody[$(e).attr('name')] = $(e).val();
+            });
+            form.find('select').each(function(i, e) {
+                postbody[$(e).attr('name')] = $(e).val();
+            });
+            $.ajax({
+                url: '../tech/new',
+                dataType: 'json',
+                method: 'POST',
+                data: postbody
+            }).done(function(data) {
+                if (data.success === false) {
+                    return loadTemplate('error', target, assembleErrorData(data.error));
+                } else {
+                    return loadNewTech(target);
+                }
+            });
+        });
       });
-      form.find('select').each(function(i, e) {
-          postbody[$(e).attr('name')] = $(e).val();
-      });
-      form.find('textarea').each(function(i, e){
-          postbody[$(e).attr('name')] = $(e).val();
-      });
-      $.ajax({
-          url: '../tech/new',
-          dataType: 'json',
-          method: 'POST',
-          data: postbody
-      }).done(function(data) {
-          if (data.success === false) {
-              return loadTemplate('error', target, assembleErrorData(data.error));
-          } else {
-              return loadReviewsForProduct(target,techId, techName);
-          }
-      });
+    }, function(reason) {
+        return loadTemplate('error', target, assembleErrorData(reason));
     });
-  }, function(reason){
-    return loadTemplate('error', target, assembleErrorData(reason));
-  });
+};
+var loadResourceTable = function(target) {
+    return loadTemplate('defaultTables', target).then(function(value) {
+        $.getScript({
+            url: '../public/js/resource_table.js',
+            dataType: 'script',
+        }).done(function() {
+            loadTable();
+        });
+    });
 };
 var assemblePlayerName = function(player) {
     var ret = {};
     ret.keys = {};
     ret.body = {};
-    ret.keys.list = ["displayname", "techs", "_id"];
+    ret.keys.list = ["_id", "displayname"];
     ret.body.list = ["toAdd"];
-    ret.list = products;
+    ret.list = player;
     return ret;
 };
 var loadPlayerName = function(target) {
+  return new Promise(function(resolve, reject){
     $.ajax({
-        url: "../palyernames/all",
+        url: "../tech/players",
         dataType: 'json'
     }).done(function(data) {
         if (data.success === false) {
-            return loadTemplate('error', target, assembleErrorData(data.error));
+            return reject(loadTemplate('error', target, assembleErrorData(data.error)));
         } else {
-            return loadTemplate('playerNames', target, assemblePlayerName(data.result)).then(function(resolve) {
-            }, function(reason) {
-                return loadTemplate('error', target, assembleErrorData(reason));
-            });
+            return resolve(loadTemplate('playerNames', target, assemblePlayerName(data.result)));
         }
     });
+  });
 };
